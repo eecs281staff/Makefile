@@ -298,7 +298,8 @@ help:
 ######################
 
 # these targets do not create any files
-.PHONY: all release debug profile static clean alltests partialsubmit \
-        fullsubmit ungraded sync2caen help identifier
+.PHONY: all release debug profile gprof static clean alltests
+.PHONY: partialsubmit fullsubmit ungraded sync2caen help identifier
+
 # disable built-in rules
 .SUFFIXES:
