@@ -1,6 +1,6 @@
 # EECS 281 Makefile
 
-See [this video](https://www.youtube.com/watch?v=n-ZmFjCp1QY) for information on how to use the Makefile.
+## See [this video](https://www.youtube.com/watch?v=n-ZmFjCp1QY) for information on how to use the Makefile.
 
 Include this makefile in your EECS 281 projects and many
 of your troubles will go away...
