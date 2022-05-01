@@ -72,7 +72,9 @@ UNGRADED_SUBMITFILE = ungraded.tar.gz
 # name of the perf data file, only used by the clean target
 PERF_FILE = perf.data*
 
-#Default Flags (we prefer -std=c++17 but Mac/Xcode/Clang doesn't support)
+# Default Flags (we prefer -std=c++17 but Mac/Xcode/Clang doesn't support)
+# WARNING: Adding flags like _GLIBCXX_DEBUG or -fsanitize
+# may prevent your project from working properly!
 CXXFLAGS = -std=c++1z -Wconversion -Wall -Werror -Wextra -pedantic 
 
 # make release - will compile "all" with $(CXXFLAGS) and the -O3 flag
