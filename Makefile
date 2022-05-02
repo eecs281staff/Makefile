@@ -69,6 +69,9 @@ FULL_SUBMITFILE = fullsubmit.tar.gz
 PARTIAL_SUBMITFILE = partialsubmit.tar.gz
 UNGRADED_SUBMITFILE = ungraded.tar.gz
 
+# Files that should not be included in a tarball
+EXCLUDE_FILES = getopt.\?
+
 # name of the perf data file, only used by the clean target
 PERF_FILE = perf.data*
 
@@ -108,7 +111,7 @@ static:
 #                   include the project identifier; skip subdirectories;
 #                   also removes old submit tarballs, they are outdated
 identifier:
-	@if [ $$(grep --include=*.{h,hpp,c,cpp} --exclude=xcode_redirect.hpp --directories=skip -L $(IDENTIFIER) * | wc -l) -ne 0 ]; then \
+	@if [ $$(grep --include=*.{h,hpp,c,cpp} --exclude=xcode_redirect.hpp --exclude=$(EXCLUDE_FILES) --directories=skip -L $(IDENTIFIER) * | wc -l) -ne 0 ]; then \
 		printf "Missing project identifier in file(s): "; \
 		echo `grep --include=*.{h,hpp,c,cpp} --directories=skip -L $(IDENTIFIER) *`; \
 		rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE); \
@@ -165,7 +168,8 @@ FULL_SUBMITFILES=$(filter-out $(TESTSOURCES), \
 # including test files
 $(FULL_SUBMITFILE): $(FULL_SUBMITFILES)
 	rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE)
-	COPYFILE_DISABLE=true tar -vczf $(FULL_SUBMITFILE) $(FULL_SUBMITFILES)
+	COPYFILE_DISABLE=true tar -vczf $(FULL_SUBMITFILE) $(FULL_SUBMITFILES) \
+      --exclude=$(EXCLUDE_FILES)
 	@echo !!! Final submission prepared, test files included... READY FOR GRADING !!!
 
 # make partialsubmit.tar.gz - cleans, creates tarball
@@ -174,7 +178,7 @@ PARTIAL_SUBMITFILES=$(filter-out $(wildcard test*.txt), $(FULL_SUBMITFILES))
 $(PARTIAL_SUBMITFILE): $(PARTIAL_SUBMITFILES)
 	rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE)
 	COPYFILE_DISABLE=true tar -vczf $(PARTIAL_SUBMITFILE) \
-      $(PARTIAL_SUBMITFILES)
+      $(PARTIAL_SUBMITFILES) --exclude=$(EXCLUDE_FILES)
 	@echo !!! WARNING: No test files included. Use 'make fullsubmit' to include test files. !!!
 
 # make ungraded.tar.gz - cleans, creates tarball omitting test files, Makefile
@@ -183,7 +187,7 @@ $(UNGRADED_SUBMITFILE): $(UNGRADED_SUBMITFILES)
 	rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE)
 	@touch __ungraded
 	COPYFILE_DISABLE=true tar -vczf $(UNGRADED_SUBMITFILE) \
-      $(UNGRADED_SUBMITFILES) __ungraded
+      $(UNGRADED_SUBMITFILES) __ungraded --exclude=$(EXCLUDE_FILES)
 	@rm -f __ungraded
 	@echo !!! WARNING: This submission will not be graded. !!!
 
