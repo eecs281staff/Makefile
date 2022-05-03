@@ -168,8 +168,7 @@ FULL_SUBMITFILES=$(filter-out $(TESTSOURCES), \
 # including test files
 $(FULL_SUBMITFILE): $(FULL_SUBMITFILES)
 	rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE)
-	COPYFILE_DISABLE=true tar -vczf $(FULL_SUBMITFILE) $(FULL_SUBMITFILES) \
-      --exclude=$(EXCLUDE_FILES)
+	COPYFILE_DISABLE=true tar --exclude=$(EXCLUDE_FILES) -vczf $(FULL_SUBMITFILE) $(FULL_SUBMITFILES)
 	@echo !!! Final submission prepared, test files included... READY FOR GRADING !!!
 
 # make partialsubmit.tar.gz - cleans, creates tarball
@@ -177,8 +176,8 @@ $(FULL_SUBMITFILE): $(FULL_SUBMITFILES)
 PARTIAL_SUBMITFILES=$(filter-out $(wildcard test*.txt), $(FULL_SUBMITFILES))
 $(PARTIAL_SUBMITFILE): $(PARTIAL_SUBMITFILES)
 	rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE)
-	COPYFILE_DISABLE=true tar -vczf $(PARTIAL_SUBMITFILE) \
-      $(PARTIAL_SUBMITFILES) --exclude=$(EXCLUDE_FILES)
+	COPYFILE_DISABLE=true tar --exclude=$(EXCLUDE_FILES) -vczf $(PARTIAL_SUBMITFILE) \
+      $(PARTIAL_SUBMITFILES)
 	@echo !!! WARNING: No test files included. Use 'make fullsubmit' to include test files. !!!
 
 # make ungraded.tar.gz - cleans, creates tarball omitting test files, Makefile
@@ -186,8 +185,8 @@ UNGRADED_SUBMITFILES=$(filter-out Makefile, $(PARTIAL_SUBMITFILES))
 $(UNGRADED_SUBMITFILE): $(UNGRADED_SUBMITFILES)
 	rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE)
 	@touch __ungraded
-	COPYFILE_DISABLE=true tar -vczf $(UNGRADED_SUBMITFILE) \
-      $(UNGRADED_SUBMITFILES) __ungraded --exclude=$(EXCLUDE_FILES)
+	COPYFILE_DISABLE=true tar --exclude=$(EXCLUDE_FILES) -vczf $(UNGRADED_SUBMITFILE) \
+      $(UNGRADED_SUBMITFILES) __ungraded
 	@rm -f __ungraded
 	@echo !!! WARNING: This submission will not be graded. !!!
 
