@@ -111,7 +111,7 @@ static:
 #                   include the project identifier; skip subdirectories;
 #                   also removes old submit tarballs, they are outdated
 identifier:
-	@if [ $$(grep --include=*.{h,hpp,c,cpp} --exclude=xcode_redirect.hpp --exclude getopt.h --exclude xgetopt.h --exclude xgetopt.h --exclude=$(EXCLUDE_FILES) --directories=skip -L $(IDENTIFIER) * | wc -l) -ne 0 ]; then \
+	@if [ $$(grep --include=*.{h,hpp,c,cpp} --exclude=xcode_redirect.hpp --exclude getopt.h --exclude getopt.cpp --exclude xgetopt.h --exclude=$(EXCLUDE_FILES) --directories=skip -L $(IDENTIFIER) * | wc -l) -ne 0 ]; then \
 		printf "Missing project identifier in file(s): "; \
 		echo `grep --include=*.{h,hpp,c,cpp} --directories=skip -L $(IDENTIFIER) *`; \
 		rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE); \
