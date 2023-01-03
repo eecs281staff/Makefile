@@ -1,14 +1,38 @@
 # EECS 281 Makefile
 
-## See [this video](https://www.youtube.com/watch?v=n-ZmFjCp1QY) for information on how to use the Makefile.
+A Makefile for EECS 281 projects that supports compilation, submission tarball creation, sync to CAEN Linux, and more.
 
-Include this makefile in your EECS 281 projects and many
-of your troubles will go away...
+See [this video](https://www.youtube.com/watch?v=n-ZmFjCp1QY) for information on how to use the Makefile.
 
-**Using this Makefile is no substitute for learning make and
-understanding Makefiles!**
+## Quick Start
+Download into the directory containing your project source code.
+```console
+$ wget https://gitlab.umich.edu/eecs281/makefile/-/raw/main/Makefile
+```
 
-Usage:
-    make help
+Edit these lines in the Makefile.  Your values might be different, check the project spec for required file names.
+```make
+UNIQNAME = not_awdeorio
+# ...
+IDENTIFIER  = copy_me_from_project_spec
+# ...
+PROJECTFILE = main.cpp
+# ...
+EXECUTABLE = main
+```
 
-Make sure you search for **TODO** and update the Makefile.
+**Shortcut:** You can skip updating `PROJECTFILE` if your `main()` function is in one of these filenames: `main.cpp`, `project0.cpp`, `project1.cpp`, `project2.cpp`, `project3.cpp`, `project4.cpp`, or `EXECUTABLE.cpp`.
+
+If your project has additional dependencies, update the dependencies section at the bottom of the `Makefile`.
+
+You should be able to compile and run your main file.
+```console
+$ make
+$ ./main
+hello world!
+```
+
+## More
+```console
+$ make help
+```
