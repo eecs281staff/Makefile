@@ -35,6 +35,12 @@ EXECUTABLE  = executable
 PROJECTFILE = $(or $(wildcard project*.cpp $(EXECUTABLE).cpp), main.cpp)
 # If main() is in another file delete line above, edit and uncomment below
 #PROJECTFILE = mymainfile.cpp
+
+# This is the path from the CAEN home folder to where projects will be
+# uploaded. (eg. /home/mmdarden/eecs281/project1)
+# Change this if you prefer a different path.
+# REMOTE_PATH := eecs281_$(EXECUTABLE)_sync  # /home/mmdarden/eecs281_proj0_sync
+REMOTE_PATH := eecs281_$(EXECUTABLE)_sync
 #######################
 # TODO (end) #
 #######################
@@ -44,19 +50,18 @@ PATH := /usr/um/gcc-6.2.0/bin:$(PATH)
 LD_LIBRARY_PATH := /usr/um/gcc-6.2.0/lib64
 LD_RUN_PATH := /usr/um/gcc-6.2.0/lib64
 
-# This is the path from the CAEN home folder to where projects will be
-# uploaded. (eg. /home/mmdarden/eecs281/project1)
-# Change this if you prefer a different path.
-# REMOTE_PATH := eecs281_$(EXECUTABLE)_sync  # /home/mmdarden/eecs281_proj0_sync
-REMOTE_PATH := eecs281_$(EXECUTABLE)_sync
+# disable built-in rules
+.SUFFIXES:
 
 # designate which compiler to use
 CXX         = g++
 
+# rule for creating objects
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $*.cpp
+
 # list of test drivers (with main()) for development
 TESTSOURCES = $(wildcard test*.cpp)
-# names of test executables
-TESTS       = $(TESTSOURCES:%.cpp=%)
 
 # list of sources used in project
 SOURCES     = $(wildcard *.cpp)
@@ -64,72 +69,79 @@ SOURCES     := $(filter-out $(TESTSOURCES), $(SOURCES))
 # list of objects used in project
 OBJECTS     = $(SOURCES:%.cpp=%.o)
 
-# name of the tarball created for submission
-FULL_SUBMITFILE = fullsubmit.tar.gz
-PARTIAL_SUBMITFILE = partialsubmit.tar.gz
-UNGRADED_SUBMITFILE = ungraded.tar.gz
-
-# Files that should not be included in a tarball
-EXCLUDE_FILES = getopt.h
-
-# name of the perf data file, only used by the clean target
-PERF_FILE = perf.data*
-
-# Default Flags (we prefer -std=c++17 but Mac/Xcode/Clang doesn't support)
-# WARNING: Adding flags like _GLIBCXX_DEBUG or -fsanitize
-# may prevent your project from working properly!
-CXXFLAGS = -std=c++1z -Wconversion -Wall -Werror -Wextra -pedantic
+# Default Flags
+CXXFLAGS = -std=c++17 -Wconversion -Wall -Werror -Wextra -pedantic
 
 # make release - will compile "all" with $(CXXFLAGS) and the -O3 flag
 #                also defines NDEBUG so that asserts will not check
 release: CXXFLAGS += -O3 -DNDEBUG
 release: $(EXECUTABLE)
+.PHONY: release
 
 # make debug - will compile sources with $(CXXFLAGS) and the -g3 flag
 #              also defines DEBUG, so "#ifdef DEBUG /*...*/ #endif" works
-debug: CXXFLAGS += -g3 -DDEBUG
+debug: CXXFLAGS += -g3 -DDEBUG -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG
 debug:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_debug
+.PHONY: debug
 
 # make profile - will compile "all" with $(CXXFLAGS) and the -g3 and -O3 flags
 profile: CXXFLAGS += -g3 -O3
 profile:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_profile
+.PHONY: profile
 
 # make gprof - will compile "all" with $(CXXFLAGS) and the -pg (for gprof)
 gprof: CXXFLAGS += -pg
 gprof:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_profile
+.PHONY: gprof
 
 # make static - will perform static analysis in the matter currently used
 #               on the autograder
 static:
 	cppcheck --enable=all --suppress=missingIncludeSystem \
       $(SOURCES) *.h *.hpp
+.PHONY: static
+
+# name of the tarballs created for submission
+FULL_SUBMITFILE = fullsubmit.tar.gz
+PARTIAL_SUBMITFILE = partialsubmit.tar.gz
+UNGRADED_SUBMITFILE = ungraded.tar.gz
+
+# These files are excluded when checking for project identifier (no spaces!)
+NO_IDENTIFIER = xcode_redirect.hpp,getopt.h,getopt.c,xgetopt.h
 
 # make identifier - will check to ensure that all source code and header files
-#                   include the project identifier; skip subdirectories;
+#                   include the project identifier, skip subdirectories
 #                   also removes old submit tarballs, they are outdated
+identifier: $(foreach tsrc,$(TESTSOURCES),$(eval NO_IDENTIFIER := $(NO_IDENTIFIER),$(tsrc)))
 identifier:
-	@if [ $$(grep --include=*.{h,hpp,c,cpp} --exclude=xcode_redirect.hpp --exclude getopt.h --exclude getopt.cpp --exclude xgetopt.h --exclude=$(EXCLUDE_FILES) --directories=skip -L $(IDENTIFIER) * | wc -l) -ne 0 ]; then \
+	@if [ $$(grep --include=*.{h,hpp,c,cpp} --exclude={$(NO_IDENTIFIER)} --directories=skip -L $(IDENTIFIER) * | wc -l) -ne 0 ]; then \
 		printf "Missing project identifier in file(s): "; \
-		echo `grep --include=*.{h,hpp,c,cpp} --directories=skip -L $(IDENTIFIER) *`; \
-		rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE); \
+		echo `grep --include=*.{h,hpp,c,cpp} --exclude={$(NO_IDENTIFIER)} --directories=skip -L $(IDENTIFIER) *`; \
 		exit 1; \
+	else \
+		rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE); \
 	fi
+.PHONY: identifier
 
 # Build all executables
-all: release debug profile
+all: release debug
+all: profile
+.PHONY: all
 
 $(EXECUTABLE): $(OBJECTS)
-ifeq ($(EXECUTABLE), executable)
+ifneq ($(EXECUTABLE), executable)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(EXECUTABLE)
+else
 	@echo Edit EXECUTABLE variable in Makefile.
 	@echo Using default a.out.
 	$(CXX) $(CXXFLAGS) $(OBJECTS)
-else
-	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(EXECUTABLE)
 endif
 
+# names of test executables
+TESTS       = $(TESTSOURCES:%.cpp=%)
 # Automatically generate any build rules for test*.cpp files
 define make_tests
     ifeq ($$(PROJECTFILE),)
@@ -146,18 +158,18 @@ endef
 $(foreach test, $(TESTS), $(eval $(call make_tests, $(test))))
 
 alltests: $(TESTS)
-
-# rule for creating objects
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $*.cpp
+.PHONY: alltests
 
 # make clean - remove .o files, executables, tarball
 clean:
-	rm -f $(OBJECTS) $(EXECUTABLE) $(EXECUTABLE)_debug $(EXECUTABLE)_profile \
-      $(TESTS) $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(PERF_FILE) \
-      $(UNGRADED_SUBMITFILE)
 	rm -Rf *.dSYM
+	rm -f $(OBJECTS) $(EXECUTABLE) $(EXECUTABLE)_debug
+	rm -f $(EXECUTABLE)_profile $(TESTS) perf.data* \
+      $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE)
+.PHONY: clean
 
+# Files that should not be included in a tarball
+EXCLUDE_FILES = getopt.h
 
 # get a list of all files that might be included in a submit
 # different submit types can do additional filtering to remove unwanted files
@@ -194,6 +206,7 @@ $(UNGRADED_SUBMITFILE): $(UNGRADED_SUBMITFILES)
 fullsubmit: identifier $(FULL_SUBMITFILE)
 partialsubmit: identifier $(PARTIAL_SUBMITFILE)
 ungraded: identifier $(UNGRADED_SUBMITFILE)
+.PHONY: fullsubmit partialsubmit ungraded
 
 # REMOTE_PATH has default definition above
 sync2caen:
@@ -216,6 +229,7 @@ endif
       "."/ \
       "$(UNIQNAME)@login.engin.umich.edu:'$(REMOTE_PATH)/'"
 	echo "Files synced to CAEN at ~/$(REMOTE_PATH)/"
+.PHONY: sync2caen
 
 define MAKEFILE_HELP
 EECS281 Advanced Makefile Help
@@ -275,6 +289,7 @@ export MAKEFILE_HELP
 
 help:
 	@echo "$$MAKEFILE_HELP"
+.PHONY: help
 
 #######################
 # TODO (begin) #
@@ -305,10 +320,3 @@ help:
 ######################
 # TODO (end) #
 ######################
-
-# these targets do not create any files
-.PHONY: all release debug profile gprof static clean alltests
-.PHONY: partialsubmit fullsubmit ungraded sync2caen help identifier
-
-# disable built-in rules
-.SUFFIXES:

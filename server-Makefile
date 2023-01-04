@@ -1,0 +1,83 @@
+#######################################################
+##            EECS 281 Server Makefile               ##
+## This file has overwritten the student's Makefile! ##
+#######################################################
+
+# IMPORTANT STAFF NOTES:
+#   1. Set IDENTIFIER to match the project identifier given in the spec
+#   2. Set EXECUTABLE to the command name from the project specification.
+#   3. Rename this file to 'Makefile' when including in an autograder build
+
+# Change the right hand side of the identifier to match the project identifier
+# given in the project or lab specification.
+IDENTIFIER  = EEC50281EEC50281EEC50281EEC50281EEC50281
+
+# Change 'executable' to match the command name given in the project spec.
+EXECUTABLE  = executable
+
+# enables c++17 on CAEN or 281 autograder
+PATH := /usr/um/gcc-6.2.0/bin:$(PATH)
+LD_LIBRARY_PATH := /usr/um/gcc-6.2.0/lib64
+LD_RUN_PATH := /usr/um/gcc-6.2.0/lib64
+
+# disable built-in rules
+.SUFFIXES:
+
+# designate which compiler to use
+CXX         = g++
+
+# rule for creating objects
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $*.cpp
+
+# list of test drivers (with main()) for development
+TESTSOURCES = $(wildcard test*.cpp)
+
+# list of sources used in project
+SOURCES     = $(wildcard *.cpp)
+SOURCES     := $(filter-out $(TESTSOURCES), $(SOURCES))
+# list of objects used in project
+OBJECTS     = $(SOURCES:%.cpp=%.o)
+
+# Default Flags
+CXXFLAGS = -std=c++17 -Wconversion -Wall -Werror -Wextra -pedantic 
+
+# make release - will compile "all" with $(CXXFLAGS) and the -O3 flag
+#                also defines NDEBUG so that asserts will not check
+release: CXXFLAGS += -O3 -DNDEBUG
+release: $(EXECUTABLE)
+.PHONY: release
+
+# make debug - will compile sources with $(CXXFLAGS) and the -g3 flag
+#              also defines DEBUG, so "#ifdef DEBUG /*...*/ #endif" works
+debug: CXXFLAGS += -g3 -DDEBUG
+debug:
+	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_debug
+.PHONY: debug
+
+# These files are excluded when checking for project identifier (no spaces!)
+NO_IDENTIFIER = xcode_redirect.hpp,getopt.h,getopt.c,xgetopt.h
+
+# make identifier - will check to ensure that all source code and header files
+#                   include the project identifier, skip subdirectories
+identifier: $(foreach tsrc,$(TESTSOURCES),$(eval NO_IDENTIFIER := $(NO_IDENTIFIER),$(tsrc)))
+identifier:
+	@if [ $$(grep --include=*.{h,hpp,c,cpp} --exclude={$(NO_IDENTIFIER)} --directories=skip -L $(IDENTIFIER) * | wc -l) -ne 0 ]; then \
+		printf "Missing project identifier in file(s): "; \
+		echo `grep --include=*.{h,hpp,c,cpp} --exclude={$(NO_IDENTIFIER)} --directories=skip -L $(IDENTIFIER) *`; \
+		exit 1; \
+	fi
+.PHONY: identifier
+
+# Build all executables
+all: release debug
+.PHONY: all
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(EXECUTABLE)
+
+# make clean - remove .o files and executables
+clean:
+	rm -Rf *.dSYM
+	rm -f $(OBJECTS) $(EXECUTABLE) $(EXECUTABLE)_debug
+.PHONY: clean
