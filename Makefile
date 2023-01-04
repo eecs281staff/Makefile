@@ -169,7 +169,7 @@ clean:
 .PHONY: clean
 
 # Files that should not be included in a tarball
-EXCLUDE_FILES = getopt.h
+EXCLUDE_FILES = getopt.\?
 
 # get a list of all files that might be included in a submit
 # different submit types can do additional filtering to remove unwanted files
