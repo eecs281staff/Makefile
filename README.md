@@ -5,12 +5,16 @@ A Makefile for EECS 281 projects that supports compilation, submission tarball c
 See [this video](https://www.youtube.com/watch?v=n-ZmFjCp1QY) for information on how to use the Makefile.
 
 ## Quick Start
+
 Download into the directory containing your project source code.
+
 ```console
 $ wget https://raw.githubusercontent.com/eecs281staff/Makefile/main/Makefile
+Downloads `Makefile` to your current directory, overwriting any existing file...
 ```
 
 Edit these lines in the Makefile.  Your values might be different, check the project spec for required file names.
+
 ```make
 UNIQNAME = not_awdeorio
 # ...
@@ -26,13 +30,17 @@ EXECUTABLE = main
 If your project has additional dependencies, update the dependencies section at the bottom of the `Makefile`.
 
 You should be able to compile and run your main file.
+
 ```console
 $ make
 $ ./main
 hello world!
 ```
 
-## More
+## More Information
+
 ```console
 $ make help
+EECS281 Advanced Makefile Help
+...
 ```
