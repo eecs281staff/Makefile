@@ -78,19 +78,19 @@ release: CXXFLAGS += -O3 -DNDEBUG
 release: $(EXECUTABLE)
 .PHONY: release
 
-# make debug - will compile sources with $(CXXFLAGS) and the -g3 flag
-#              also defines DEBUG, so "#ifdef DEBUG /*...*/ #endif" works
-debug: CXXFLAGS += -g3 -DDEBUG
+# make debug - will compile sources with $(CXXFLAGS) -g3 and -fsanitize
+#              flags also defines DEBUG and _GLIBCXX_DEBUG
+debug: CXXFLAGS += -g3 -DDEBUG -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG
 debug:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_debug
 .PHONY: debug
 
-# make sanitize - will compile sources with $(CXXFLAGS) -g3 and -fsanitize
-#                 flags also defines DEBUG and _GLIBCXX_DEBUG
-sanitize: CXXFLAGS += -g3 -DDEBUG -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG
-sanitize:
-	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_sanitize
-.PHONY: sanitize
+# make valgrind - will compile sources with $(CXXFLAGS) -g3 suitable for
+#                 CAEN or WSL (DOES NOT WORK ON MACOS).
+valgrind: CXXFLAGS += -g3
+valgrind:
+	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_valgrind
+.PHONY: valgrind
 
 # make profile - will compile "all" with $(CXXFLAGS) and the -g3 and -O3 flags
 profile: CXXFLAGS += -g3 -O3
@@ -135,7 +135,7 @@ identifier:
 
 # Build all executables
 all: release debug
-all: profile sanitize
+all: profile valgrind
 .PHONY: all
 
 $(EXECUTABLE): $(OBJECTS)
@@ -171,7 +171,7 @@ alltests: $(TESTS)
 clean:
 	rm -Rf *.dSYM
 	rm -f $(OBJECTS) $(EXECUTABLE) $(EXECUTABLE)_debug
-	rm -f $(EXECUTABLE)_profile $(TESTS) perf.data* \
+	rm -f $(EXECUTABLE)_valgrind $(EXECUTABLE)_profile $(TESTS) perf.data* \
       $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE)
 .PHONY: clean
 
@@ -228,6 +228,7 @@ endif
       --exclude '*.o' \
       --exclude '$(EXECUTABLE)' \
       --exclude '$(EXECUTABLE)_debug' \
+      --exclude '$(EXECUTABLE)_valgrind' \
       --exclude '$(EXECUTABLE)_profile' \
       --exclude '.git*' \
       --exclude '.vs*' \
