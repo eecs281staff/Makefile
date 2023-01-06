@@ -80,10 +80,17 @@ release: $(EXECUTABLE)
 
 # make debug - will compile sources with $(CXXFLAGS) and the -g3 flag
 #              also defines DEBUG, so "#ifdef DEBUG /*...*/ #endif" works
-debug: CXXFLAGS += -g3 -DDEBUG -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG
+debug: CXXFLAGS += -g3 -DDEBUG
 debug:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_debug
 .PHONY: debug
+
+# make sanitize - will compile sources with $(CXXFLAGS) -g3 and -fsanitize
+#                 flags also defines DEBUG and _GLIBCXX_DEBUG
+sanitize: CXXFLAGS += -g3 -DDEBUG -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG
+sanitize:
+	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_sanitize
+.PHONY: sanitize
 
 # make profile - will compile "all" with $(CXXFLAGS) and the -g3 and -O3 flags
 profile: CXXFLAGS += -g3 -O3
@@ -128,7 +135,7 @@ identifier:
 
 # Build all executables
 all: release debug
-all: profile
+all: profile sanitize
 .PHONY: all
 
 $(EXECUTABLE): $(OBJECTS)
@@ -313,7 +320,7 @@ help:
 #
 # THE COMPILER CAN GENERATE DEPENDENCIES FROM SOURCE CODE
 #
-# % g++ -std=c++1z -MM *.cpp
+# % g++ -std=c++17 -MM *.cpp
 #
 # ADD YOUR OWN DEPENDENCIES HERE
 
