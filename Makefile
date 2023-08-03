@@ -45,10 +45,10 @@ REMOTE_PATH := eecs281_$(EXECUTABLE)_sync
 # TODO (end) #
 #######################
 
-# enables c++17 on CAEN or 281 autograder
-PATH := /usr/um/gcc-6.2.0/bin:$(PATH)
-LD_LIBRARY_PATH := /usr/um/gcc-6.2.0/lib64
-LD_RUN_PATH := /usr/um/gcc-6.2.0/lib64
+# enables c++20 on CAEN or 281 autograder
+PATH := /usr/um/gcc-11.3.0/bin:$(PATH)
+LD_LIBRARY_PATH := /usr/um/gcc-11.3.0/lib64
+LD_RUN_PATH := /usr/um/gcc-11.3.0/lib64
 
 # disable built-in rules
 .SUFFIXES:
@@ -70,7 +70,7 @@ SOURCES     := $(filter-out $(TESTSOURCES), $(SOURCES))
 OBJECTS     = $(SOURCES:%.cpp=%.o)
 
 # Default Flags
-CXXFLAGS = -std=c++17 -Wconversion -Wall -Werror -Wextra -pedantic
+CXXFLAGS = -std=c++20 -Wconversion -Wall -Werror -Wextra -pedantic
 
 # make debug - will compile sources with $(CXXFLAGS) -g3 and -fsanitize
 #              flags also defines DEBUG and _GLIBCXX_DEBUG
@@ -321,7 +321,7 @@ help:
 #
 # THE COMPILER CAN GENERATE DEPENDENCIES FROM SOURCE CODE
 #
-# % g++ -std=c++17 -MM *.cpp
+# % g++ -std=c++20 -MM *.cpp
 #
 # ADD YOUR OWN DEPENDENCIES HERE
 
