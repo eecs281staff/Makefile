@@ -235,7 +235,7 @@ endif
       --exclude '*.code-workspace' \
       --filter=":- .gitignore" \
       "."/ \
-      "$(UNIQNAME)@login.engin.umich.edu:'$(REMOTE_PATH)/'"
+      "$(UNIQNAME)@login.engin.umich.edu:$(REMOTE_PATH)/"
 	echo "Files synced to CAEN at ~/$(REMOTE_PATH)/"
 .PHONY: sync2caen
 
