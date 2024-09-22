@@ -181,15 +181,13 @@ EXCLUDE_FILES = getopt.\?
 FULL_SUBMITFILES=$(filter-out $(wildcard test*.cpp), \
                    $(wildcard Makefile *.h *.hpp *.cpp test*.txt))
 
-# make fullsubmit.tar.gz - cleans, runs dos2unix, creates tarball
-# including test files
+# make fullsubmit.tar.gz - cleans, creates tarball including test files
 $(FULL_SUBMITFILE): $(FULL_SUBMITFILES)
 	rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE)
 	COPYFILE_DISABLE=true tar --exclude=$(EXCLUDE_FILES) -vczf $(FULL_SUBMITFILE) $(FULL_SUBMITFILES)
 	@echo !!! Final submission prepared, test files included... READY FOR GRADING !!!
 
-# make partialsubmit.tar.gz - cleans, creates tarball
-# omitting test files
+# make partialsubmit.tar.gz - cleans, creates tarball omitting test files
 PARTIAL_SUBMITFILES=$(filter-out $(wildcard test*.txt), $(FULL_SUBMITFILES))
 $(PARTIAL_SUBMITFILE): $(PARTIAL_SUBMITFILES)
 	rm -f $(PARTIAL_SUBMITFILE) $(FULL_SUBMITFILE) $(UNGRADED_SUBMITFILE)
