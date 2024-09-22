@@ -264,6 +264,14 @@ EECS281 Advanced Makefile Help
        It is also useful when trying to find buggy solutions in the
        autograder.
            $$ make fullsubmit
+    C) Build 'ungraded.tar.gz' a tarball without tests that the autograder
+       will not try to build.
+
+           *** USE THIS ONLY TO UPLOAD CODE TO THE AUTOGRADER FOR STAFF ***
+
+       This is only useful for a staff member who wants to view your most
+       recent code on the autograder.
+           $$ make ungraded
 
 * Unit testing support
     A) Source files for unit testing should be named test*.cpp.  Examples
