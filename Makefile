@@ -65,6 +65,7 @@ CXX         = g++
 
 # list of test drivers (with main()) for development
 TESTSOURCES = $(wildcard test*.cpp)
+TESTSOURCES := $(filter-out $(PROJECTFILE),$(TESTSOURCES))
 
 # list of sources used in project
 SOURCES     = $(wildcard *.cpp)
@@ -119,7 +120,7 @@ NO_IDENTIFIER = xcode_redirect.hpp,getopt.h,getopt.c,xgetopt.h
 # make identifier - will check to ensure that all source code and header files
 #                   include the project identifier, skip subdirectories
 #                   also removes old submit tarballs, they are outdated
-identifier: $(foreach tsrc,$(TESTSOURCES),$(eval NO_IDENTIFIER := $(NO_IDENTIFIER),$(tsrc)))
+identifier: $(foreach tsrc,$(wildcard test*.cpp),$(eval NO_IDENTIFIER := $(NO_IDENTIFIER),$(tsrc)))
 identifier:
 	@if [ $$(grep --include=*.{h,hpp,c,cpp} --exclude={$(NO_IDENTIFIER)} --directories=skip -L $(IDENTIFIER) * | wc -l) -ne 0 ]; then \
 		printf "Missing project identifier in file(s): "; \
@@ -177,7 +178,7 @@ EXCLUDE_FILES = getopt.\?
 
 # get a list of all files that might be included in a submit
 # different submit types can do additional filtering to remove unwanted files
-FULL_SUBMITFILES=$(filter-out $(TESTSOURCES), \
+FULL_SUBMITFILES=$(filter-out $(wildcard test*.cpp), \
                    $(wildcard Makefile *.h *.hpp *.cpp test*.txt))
 
 # make fullsubmit.tar.gz - cleans, runs dos2unix, creates tarball
