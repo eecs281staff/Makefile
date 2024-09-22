@@ -101,12 +101,6 @@ profile:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_profile
 .PHONY: profile
 
-# make gprof - will compile "all" with $(CXXFLAGS) and the -pg (for gprof)
-gprof: CXXFLAGS += -pg
-gprof:
-	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_profile
-.PHONY: gprof
-
 # make static - will perform static analysis in the matter currently used
 #               on the autograder
 static:
