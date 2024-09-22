@@ -1,5 +1,8 @@
 ## EECS 281 Advanced Makefile
 
+# Bash is needed for project identifer logic
+SHELL = /bin/bash
+
 # How to use this Makefile...
 ###################
 ###################
