@@ -92,8 +92,8 @@ valgrind:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_valgrind
 .PHONY: valgrind
 
-# make profile - will compile "all" with $(CXXFLAGS) and the -g3 and -O3 flags
-profile: CXXFLAGS += -g3 -O3
+# make profile - will compile "all" with $(CXXFLAGS) and the -g3 flag
+profile: CXXFLAGS += -g3
 profile:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)_profile
 .PHONY: profile
