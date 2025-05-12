@@ -137,6 +137,10 @@ all: profile valgrind
 .PHONY: all
 
 $(EXECUTABLE): $(OBJECTS)
+ifeq ($(EXECUTABLE), $(MAKECMDGOALS))
+	@echo $(EXECUTABLE) is an invalid target, use \'make\' or \'make help\' to find a valid target
+	@exit 1
+endif
 ifneq ($(EXECUTABLE), executable)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(EXECUTABLE)
 else
