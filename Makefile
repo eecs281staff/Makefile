@@ -48,11 +48,6 @@ REMOTE_PATH := eecs281_$(EXECUTABLE)_sync
 # TODO (end) #
 #######################
 
-# enables c++17 on CAEN or 281 autograder
-PATH := /usr/um/gcc-11.3.0/bin:$(PATH)
-LD_LIBRARY_PATH := /usr/um/gcc-11.3.0/lib64
-LD_RUN_PATH := /usr/um/gcc-11.3.0/lib64
-
 # disable built-in rules
 .SUFFIXES:
 
