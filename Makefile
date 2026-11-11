@@ -100,8 +100,8 @@ profile:
 # make static - will perform static analysis in the matter currently used
 #               on the autograder
 static:
-	cppcheck --enable=all --suppress=missingIncludeSystem \
-      $(SOURCES) *.h *.hpp
+	cppcheck --language=c++ --enable=all --suppress=missingIncludeSystem \
+      ./*.c*
 .PHONY: static
 
 # name of the tarballs created for submission
